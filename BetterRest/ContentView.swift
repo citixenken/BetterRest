@@ -15,18 +15,36 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack {
-                Text(Date.now, format: .dateTime.day().month().year())
-                
-                DatePicker("Enter a date: ", selection: $wakeUp, in: Date.now..., displayedComponents: .hourAndMinute)
-                    .labelsHidden() //allows screen readers to use it for voiceovers
-                
-                Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.5)
+                Spacer()
+                Text("At what time do you want to wake up?")
+                    .font(.headline)
+                DatePicker("Enter a time ", selection: $wakeUp, in: Date.now..., displayedComponents: .hourAndMinute)
+                    .labelsHidden()
                     .padding(20)
+                //Spacer()
                 
-                Stepper("\(coffeeAmount.formatted()) cups", value: $coffeeAmount, in: 0...12, step: 1)
+                Text("What's your desired amount of sleep?")
+                    .font(.headline)
+                Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.25)
                     .padding(20)
+                //Spacer()
+                
+                Text("What's your daily coffee intake?")
+                    .font(.headline)
+                Stepper(coffeeAmount == 1 ? " 1 cup" : "\(coffeeAmount.formatted()) cups", value: $coffeeAmount, in: 0...30, step: 1)
+                    .padding(20)
+                Spacer()
+                
+            }
+            .navigationTitle("Better Rest")
+            .toolbar {
+                Button("Calculate", action: calculatedBedTime)
+                    .font(.title2)
             }
         }
+    }
+    
+    func calculatedBedTime() {
         
     }
 }
