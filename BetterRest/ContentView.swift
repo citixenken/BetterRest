@@ -5,6 +5,7 @@
 //  Created by Ken Muyesu on 19/12/2021.
 //
 
+import CoreML
 import SwiftUI
 
 struct ContentView: View {
@@ -12,13 +13,17 @@ struct ContentView: View {
     @State private var wakeUp = Date.now
     @State private var coffeeAmount = 1
     
+    @State private var alertTitle = ""
+    @State private var alertMessage = ""
+    @State private var showingAlert = false
+    
     var body: some View {
         NavigationView {
             VStack {
                 Spacer()
                 Text("At what time do you want to wake up?")
                     .font(.headline)
-                DatePicker("Enter a time ", selection: $wakeUp, in: Date.now..., displayedComponents: .hourAndMinute)
+                DatePicker("Enter a time ", selection: $wakeUp, displayedComponents: .hourAndMinute)
                     .labelsHidden()
                     .padding(20)
                 //Spacer()
@@ -41,11 +46,37 @@ struct ContentView: View {
                 Button("Calculate", action: calculatedBedTime)
                     .font(.title2)
             }
+            .alert(alertTitle, isPresented: $showingAlert) {
+                Button("OK") {}
+            } message: {
+                Text(alertMessage)
+            }
         }
     }
     
     func calculatedBedTime() {
+        //create instance of SleepCalculator
+        do {
+            let config = MLModelConfiguration()
+            let model = try SleepCalculator(configuration: config)
+            
+            let components = Calendar.current.dateComponents([.hour, .minute], from: wakeUp)
+            let hour = (components.hour ?? 0) * 60 * 60
+            let minute = (components.minute ?? 0) * 60
+            
+            let prediction = try model.prediction(wake: Double(hour + minute), estimatedSleep: sleepAmount, coffee: Double(coffeeAmount))
+            
+            let sleepTime = wakeUp - prediction.actualSleep
+            
+            alertTitle = "Perfect time for your sleep is..."
+            alertMessage = sleepTime.formatted(date: .complete, time: .shortened)
+            
+        } catch {
+            alertTitle = "ERROR!"
+            alertMessage = "Sorry, problem encountered when calculating your bedtime"
+        }
         
+        showingAlert = true
     }
 }
 
