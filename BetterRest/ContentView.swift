@@ -23,7 +23,7 @@ struct ContentView: View {
                 Spacer()
                 Text("At what time do you want to wake up?")
                     .font(.headline)
-                DatePicker("Enter a time ", selection: $wakeUp, displayedComponents: .hourAndMinute)
+                DatePicker("Enter a time ", selection: $wakeUp, in: Date.now...)
                     .labelsHidden()
                     .padding(20)
                 //Spacer()
